@@ -5,24 +5,41 @@ import axios from "axios";
 
 export default class QuizList extends Component {
 
+    state = {
+        quizes: []
+    }
+
     renderQuizes() {
-        return [1, 2, 3].map((quiz, index) => {
+        return this.state.quizes.map(quiz => {
             return (
                 <li
-                    key={index}
+                    key={quiz.id}
                 >
-                    <NavLink to={'/quiz/' + quiz}>
-                        Тест {quiz}
+                    <NavLink to={'/quiz/' + quiz.id}>
+                        {quiz.name}
                     </NavLink>
                 </li>
             )
         })
     }
 
-    componentDidMount() {
-        axios.get('https://react-quiz-c7bda-default-rtdb.firebaseio.com/Quiz.json').then(response => {
-            console.log(response)
-        })
+    async componentDidMount() {
+        try {
+            const response = await axios.get('https://react-quiz-c7bda-default-rtdb.firebaseio.com/Quizes.json')
+
+            const quizes = []
+            Object.keys(response.data).forEach((key, index) => {
+                quizes.push({
+                    id: key,
+                    name: `Test №${index + 1}`
+                })
+            })
+            this.setState({
+                quizes
+            })
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     render() {
@@ -32,7 +49,7 @@ export default class QuizList extends Component {
                     <h1>Список тестов</h1>
 
                     <ul>
-                        { this.renderQuizes() }
+                        {this.renderQuizes()}
                     </ul>
                 </div>
             </div>
